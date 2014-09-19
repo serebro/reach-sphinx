@@ -2,7 +2,9 @@
 
 namespace Models\Sphinx;
 
-class Video extends Base
+use Reach\Sphinx\Index;
+
+class TestIndex extends Index
 {
 
     public static function getIndexName()
@@ -21,6 +23,4 @@ class Video extends Base
             'published'  => 'timestamp',
         ];
     }
-
-    
 }

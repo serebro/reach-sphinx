@@ -1,10 +1,10 @@
 <?php
 
-namespace Models\Sphinx;
+namespace Reach\Sphinx;
 
 use XMLWriter;
 
-class Base {
+class Index {
 
     public static function getIndexName()
     {

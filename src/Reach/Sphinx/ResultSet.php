@@ -1,8 +1,10 @@
 <?php
 
-namespace Models\Sphinx;
+namespace Reach\Sphinx;
 
-class ResultSet
+use Reach\ResultSet as BaseResultSet;
+
+class ResultSet extends BaseResultSet
 {
 
 }

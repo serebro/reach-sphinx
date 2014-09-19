@@ -12,11 +12,11 @@
 	],
 	"require": {
 		"php": ">=5.4.0",
+		"ext-sphinx": ">=2.0",
 		"serebro/reach-common": "dev-master"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
-		"chriskite/phactory": "dev-master",
 		"athletic/athletic": "dev-master",
 		"satooshi/php-coveralls": "dev-master"
 	},

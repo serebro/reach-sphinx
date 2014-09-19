@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Sphinx;
+namespace Reach\Sphinx;
 
 class Query extends Criteria
 {

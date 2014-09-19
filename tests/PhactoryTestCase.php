@@ -1,11 +1,9 @@
 <?php
 
 use Phactory\Mongo\Phactory;
-use Reach\Mongo\Connection;
-use Reach\Mongo\ConnectionManager;
 
 /**
- * Test Case Base Class for using Phactory *
+ * Test Case Index Class for using Phactory *
  */
 abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
 {

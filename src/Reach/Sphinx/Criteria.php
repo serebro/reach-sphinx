@@ -1,12 +1,12 @@
 <?php
 
-namespace Models\Sphinx;
+namespace Reach\Sphinx;
 
+use Exception;
 use InvalidArgumentException;
 
 class Criteria
 {
-
 
     protected $select = [];
 
@@ -50,37 +50,51 @@ class Criteria
         SPH_GROUPBY_ATTRPAIR,
     ];
 
-    protected $ranker;
+    protected $criteria = [];
 
-    protected $rank_expr;
-
-    protected $sort_mode;
-
-    protected $sort_by;
-
-    protected $field_weights = [];
-
-    protected $index_weights = [];
-
-    protected $id_range = [];
-
-    protected $filter = [];
-
-    protected $filter_range = [];
-
-    protected $filter_float_range = [];
-
-    protected $geo_anchor = [];
-
-    protected $filter_string = [];
-
-    protected $group_by = [];
-
-    protected $group_distinct;
-
+    //protected $ranker;
+    //
+    //protected $rank_expr;
+    //
+    //protected $sort_mode;
+    //
+    //protected $sort_by;
+    //
+    //protected $field_weights = [];
+    //
+    //protected $index_weights = [];
+    //
+    //protected $id_range = [];
+    //
+    //protected $filter = [];
+    //
+    //protected $filter_range = [];
+    //
+    //protected $filter_float_range = [];
+    //
+    //protected $geo_anchor = [];
+    //
+    //protected $filter_string = [];
+    //
+    //protected $group_by = [];
+    //
+    //protected $group_distinct;
 
     public function __construct($criteria = null)
     {
+        if (empty($criteria)) {
+            return;
+        }
+
+        if (!$criteria instanceof CriteriaInterface && !is_array($criteria)) {
+            throw new Exception('Invalid parameter type.');
+        }
+
+        if ($criteria instanceof CriteriaInterface) {
+            $criteria = $criteria->asArray();
+        }
+
+        $this->criteria = $criteria;
     }
 
     /**
@@ -94,9 +108,9 @@ class Criteria
         }
 
         if (is_array($clause)) {
-            $this->select[] = current($clause) . ' as ' . key($clause);
+            $this->criteria['select'][] = current($clause) . ' as ' . key($clause);
         } else {
-            $this->select[] = $clause;
+            $this->criteria['select'][] = $clause;
         }
 
         return $this;
@@ -133,7 +147,7 @@ class Criteria
         if (!is_int($offset)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->offset = $offset;
+        $this->criteria['offset'] = $offset;
         return $this;
     }
 
@@ -146,7 +160,7 @@ class Criteria
         if (!is_int($limit)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->limit = $limit;
+        $this->criteria['limit'] = $limit;
         return $this;
     }
 
@@ -159,7 +173,7 @@ class Criteria
         if (!is_int($millis)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->max_query_time = $millis;
+        $this->criteria['max_query_time'] = $millis;
         return $this;
     }
 
@@ -172,7 +186,7 @@ class Criteria
         if (!is_int($max_matches)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->max_matches = $max_matches;
+        $this->criteria['max_matches'] = $max_matches;
         return $this;
     }
 
@@ -185,7 +199,7 @@ class Criteria
         if (!is_int($cut_off)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->cut_off = $cut_off;
+        $this->criteria['cut_off'] = $cut_off;
         return $this;
     }
 
@@ -198,7 +212,7 @@ class Criteria
         if (!in_array($mode, self::$_match_modes)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->match_mode = $mode;
+        $this->criteria['match_mode'] = $mode;
         return $this;
     }
 
@@ -209,8 +223,8 @@ class Criteria
      */
     public function rankingMode($ranker, $rank_expr = '')
     {
-        $this->ranker = $ranker;
-        $this->rank_expr = $rank_expr;
+        $this->criteria['ranker'] = $ranker;
+        $this->criteria['rank_expr'] = $rank_expr;
         return $this;
     }
 
@@ -224,8 +238,8 @@ class Criteria
         if (!in_array($mode, self::$_sort_modes)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->sort_mode = $mode;
-        $this->sort_by = $sort_by;
+        $this->criteria['sort_mode'] = $mode;
+        $this->criteria['sort_by'] = $sort_by;
         return $this;
     }
 
@@ -235,7 +249,7 @@ class Criteria
      */
     public function fieldWeights(array $weights)
     {
-        $this->field_weights = $weights;
+        $this->criteria['field_weights'] = $weights;
         return $this;
     }
 
@@ -245,7 +259,7 @@ class Criteria
      */
     public function indexWeights(array $weights)
     {
-        $this->index_weights = $weights;
+        $this->criteria['index_weights'] = $weights;
         return $this;
     }
 
@@ -259,7 +273,7 @@ class Criteria
         if (!is_int($min) || !is_int($max)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->id_range = [$min, $max];
+        $this->criteria['id_range'] = [$min, $max];
         return $this;
     }
 
@@ -274,7 +288,7 @@ class Criteria
         if (!is_string($attribute) || !is_array($values) || !count($values)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->filter[] = [$attribute, $values, $exclude];
+        $this->criteria['filter'][] = [$attribute, $values, $exclude];
         return $this;
     }
 
@@ -290,7 +304,7 @@ class Criteria
         if (!is_string($attribute) || !is_int($min) || !is_int($max)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->filter_range[] = [$attribute, $min, $max, $exclude];
+        $this->criteria['filter_range'][] = [$attribute, $min, $max, $exclude];
         return $this;
     }
 
@@ -306,7 +320,7 @@ class Criteria
         if (!is_string($attribute) || !is_int($min) || !is_int($max)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->filter_float_range[] = [$attribute, $min, $max, $exclude];
+        $this->criteria['filter_float_range'][] = [$attribute, $min, $max, $exclude];
         return $this;
     }
 
@@ -315,7 +329,7 @@ class Criteria
         if (!is_string($attribute) || !is_string($value)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->filter_string[] = [$attribute, $value, $exclude];
+        $this->criteria['filter_string'][] = [$attribute, $value, $exclude];
         return $this;
     }
 
@@ -331,7 +345,7 @@ class Criteria
         if (!is_string($attr_lat) || !is_string($attr_long) || !is_float($lat) || !is_float($long)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->geo_anchor = [$attr_lat, $attr_long, $lat, $long];
+        $this->criteria['geo_anchor'] = [$attr_lat, $attr_long, $lat, $long];
         return $this;
     }
 
@@ -349,13 +363,21 @@ class Criteria
         if (!in_array($func, self::$_group_funcs)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->group_by = [$attribute, $func, $group_sort];
+        $this->criteria['group_by'] = [$attribute, $func, $group_sort];
         return $this;
     }
 
     public function groupDistinct($attribute)
     {
-        $this->group_distinct = $attribute;
+        $this->criteria['group_distinct'] = $attribute;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function asArray()
+    {
+        return $this->criteria;
     }
 }
