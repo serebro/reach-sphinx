@@ -60,15 +60,24 @@ class Query extends Criteria
             $this->criteria['comment'] = '';
         }
 
+        if (isset($this->criteria['fields']) && count($this->criteria['fields'])) {
+            $fields = join(',', $this->criteria['fields']);
+            $fields = " @($fields) ";
+        } else {
+            $fields = '';
+        }
+
         $class = $this->_hydrate_class;
+
         /** @var \Reach\Sphinx\Connection $connection */
         $connection = $class::getConnection($this->_connection_name);
 
         /** @var SphinxClient $sphinx */
         $sphinx = $connection->getSphinxClient();
         $sphinx = $this->build($sphinx);
-        $sphinx->AddQuery($this->criteria['text'], $class::getIndexName(), $this->criteria['comment']);
-        $results = $sphinx->RunQueries();
+        $text = $sphinx->escapeString($this->criteria['text']);
+        $sphinx->addQuery($fields . $text, $class::getIndexName(), $this->criteria['comment']);
+        $results = $sphinx->runQueries();
 
         if (!is_array($results)) {
             $results[0]['error'] = $sphinx->getLastError();
@@ -85,11 +94,20 @@ class Query extends Criteria
         }
 
         if (!isset($this->criteria['setMatchMode'])) {
-            $this->matchMode(SPH_MATCH_ANY);
+            if (empty($this->criteria['text'])) {
+                $this->matchMode(SPH_MATCH_FULLSCAN);
+                //$this->matchMode(SPH_MATCH_ANY);
+            } else {
+                $this->matchMode(SPH_MATCH_EXTENDED);
+            }
         }
 
         if (!isset($this->criteria['setSortMode'])) {
-            $this->sortMode(SPH_SORT_RELEVANCE);
+            if (empty($this->criteria['text'])) {
+                $this->sortMode(SPH_SORT_EXTENDED);
+            } else {
+                $this->sortMode(SPH_SORT_RELEVANCE);
+            }
         }
 
         if (!isset($this->criteria['setArrayResult'])) {

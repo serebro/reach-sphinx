@@ -55,6 +55,49 @@ class Criteria implements CriteriaInterface
         $this->criteria = $criteria;
     }
 
+    public function search($text, array $fields = null)
+    {
+        if (!is_string($text)) {
+            throw new InvalidArgumentException('Invalid argument');
+        }
+        $this->criteria['text'] = $text;
+
+        if (!empty($fields)) {
+            if (!isset($this->criteria['fields'])) {
+                $this->criteria['fields'] = [];
+            }
+            $this->criteria['fields'] = array_merge($this->criteria['fields'], $fields);
+        }
+
+        return $this;
+    }
+
+    public function add($attribute, $value, $exclude = false)
+    {
+        if (is_string($value)) {
+            $this->filterString($attribute, $value, $exclude);
+        } else if (is_array($value)) {
+            $this->filter($attribute, $value, $exclude);
+        } else if (is_numeric($value)) {
+            $this->filter($attribute, [$value], $exclude);
+        } else {
+            throw new InvalidArgumentException('Invalid argument');
+        }
+
+        return $this;
+    }
+
+    public function addBetween($attribute, $min, $max, $exclude = false)
+    {
+        if (is_int($min) && is_int($max)) {
+            $this->filterRange($attribute, $min, $max, $exclude);
+        } else if (is_float($min) && is_float($max)) {
+            $this->filterFloatRange($attribute, $min, $max, $exclude);
+        }
+
+        return $this;
+    }
+
     /**
      * @param $clause
      * @return $this
@@ -70,18 +113,6 @@ class Criteria implements CriteriaInterface
         } else {
             $this->criteria['setSelect'][] = $clause;
         }
-
-        return $this;
-    }
-
-    public function add()
-    {
-
-        return $this;
-    }
-
-    public function addOr()
-    {
 
         return $this;
     }
@@ -326,15 +357,6 @@ class Criteria implements CriteriaInterface
     public function groupDistinct($attribute)
     {
         $this->criteria['group_distinct'] = $attribute;
-        return $this;
-    }
-
-    public function search($text)
-    {
-        if (!is_string($text)) {
-            throw new InvalidArgumentException('Invalid argument');
-        }
-        $this->criteria['text'] = $text;
         return $this;
     }
 

@@ -20,9 +20,10 @@ class CriteriaTest extends \PHPUnit_Framework_TestCase
 
     public function testWhere()
     {
-        $query = \Model\Sphinx\TestIndex::query();
-        $query->comment('test')->limit(2);
-        $resultSet = $query->search('game')->all();
+        $criteria = new \Reach\Sphinx\Criteria(['limit' => 2]);
+        $query = \Model\Sphinx\TestIndex::query($criteria);
+        $resultSet = $query->comment('test')->search('game')->all();
         $this->assertInstanceOf('\Reach\Sphinx\ResultSet', $resultSet);
+        $this->assertEquals(2, $resultSet->count());
     }
 }
