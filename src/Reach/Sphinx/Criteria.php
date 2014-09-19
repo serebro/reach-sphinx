@@ -5,22 +5,8 @@ namespace Reach\Sphinx;
 use Exception;
 use InvalidArgumentException;
 
-class Criteria
+class Criteria implements CriteriaInterface
 {
-
-    protected $select = [];
-
-    protected $max_query_time = 0;
-
-    protected $limit = null;
-
-    protected $offset = 0;
-
-    protected $max_matches = 1000;
-
-    protected $cut_off = 0;
-
-    protected $match_mode = SPH_MATCH_ANY;
 
     private static $_match_modes = [
         SPH_MATCH_ALL,
@@ -52,34 +38,6 @@ class Criteria
 
     protected $criteria = [];
 
-    //protected $ranker;
-    //
-    //protected $rank_expr;
-    //
-    //protected $sort_mode;
-    //
-    //protected $sort_by;
-    //
-    //protected $field_weights = [];
-    //
-    //protected $index_weights = [];
-    //
-    //protected $id_range = [];
-    //
-    //protected $filter = [];
-    //
-    //protected $filter_range = [];
-    //
-    //protected $filter_float_range = [];
-    //
-    //protected $geo_anchor = [];
-    //
-    //protected $filter_string = [];
-    //
-    //protected $group_by = [];
-    //
-    //protected $group_distinct;
-
     public function __construct($criteria = null)
     {
         if (empty($criteria)) {
@@ -108,9 +66,9 @@ class Criteria
         }
 
         if (is_array($clause)) {
-            $this->criteria['select'][] = current($clause) . ' as ' . key($clause);
+            $this->criteria['setSelect'][] = current($clause) . ' as ' . key($clause);
         } else {
-            $this->criteria['select'][] = $clause;
+            $this->criteria['setSelect'][] = $clause;
         }
 
         return $this;
@@ -173,7 +131,7 @@ class Criteria
         if (!is_int($millis)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['max_query_time'] = $millis;
+        $this->criteria['setMaxQueryTime'] = $millis;
         return $this;
     }
 
@@ -212,7 +170,7 @@ class Criteria
         if (!in_array($mode, self::$_match_modes)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['match_mode'] = $mode;
+        $this->criteria['setMatchMode'] = $mode;
         return $this;
     }
 
@@ -223,8 +181,7 @@ class Criteria
      */
     public function rankingMode($ranker, $rank_expr = '')
     {
-        $this->criteria['ranker'] = $ranker;
-        $this->criteria['rank_expr'] = $rank_expr;
+        $this->criteria['setRankingMode'] = [$ranker, $rank_expr];
         return $this;
     }
 
@@ -238,8 +195,7 @@ class Criteria
         if (!in_array($mode, self::$_sort_modes)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['sort_mode'] = $mode;
-        $this->criteria['sort_by'] = $sort_by;
+        $this->criteria['setSortMode'] = [$mode, $sort_by];
         return $this;
     }
 
@@ -249,7 +205,7 @@ class Criteria
      */
     public function fieldWeights(array $weights)
     {
-        $this->criteria['field_weights'] = $weights;
+        $this->criteria['setFieldWeights'] = $weights;
         return $this;
     }
 
@@ -259,7 +215,7 @@ class Criteria
      */
     public function indexWeights(array $weights)
     {
-        $this->criteria['index_weights'] = $weights;
+        $this->criteria['setIndexWeights'] = $weights;
         return $this;
     }
 
@@ -273,7 +229,7 @@ class Criteria
         if (!is_int($min) || !is_int($max)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['id_range'] = [$min, $max];
+        $this->criteria['setIDRange'] = [$min, $max];
         return $this;
     }
 
@@ -288,7 +244,7 @@ class Criteria
         if (!is_string($attribute) || !is_array($values) || !count($values)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['filter'][] = [$attribute, $values, $exclude];
+        $this->criteria['setFilter'][] = [$attribute, $values, $exclude];
         return $this;
     }
 
@@ -304,7 +260,7 @@ class Criteria
         if (!is_string($attribute) || !is_int($min) || !is_int($max)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['filter_range'][] = [$attribute, $min, $max, $exclude];
+        $this->criteria['setFilterRange'][] = [$attribute, $min, $max, $exclude];
         return $this;
     }
 
@@ -320,7 +276,7 @@ class Criteria
         if (!is_string($attribute) || !is_int($min) || !is_int($max)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['filter_float_range'][] = [$attribute, $min, $max, $exclude];
+        $this->criteria['setFilterFloatRange'][] = [$attribute, $min, $max, $exclude];
         return $this;
     }
 
@@ -329,7 +285,7 @@ class Criteria
         if (!is_string($attribute) || !is_string($value)) {
             throw new InvalidArgumentException('Invalid argument');
         }
-        $this->criteria['filter_string'][] = [$attribute, $value, $exclude];
+        $this->criteria['setFilterString'][] = [$attribute, $value, $exclude];
         return $this;
     }
 
@@ -370,6 +326,24 @@ class Criteria
     public function groupDistinct($attribute)
     {
         $this->criteria['group_distinct'] = $attribute;
+        return $this;
+    }
+
+    public function search($text)
+    {
+        if (!is_string($text)) {
+            throw new InvalidArgumentException('Invalid argument');
+        }
+        $this->criteria['text'] = $text;
+        return $this;
+    }
+
+    public function comment($text)
+    {
+        if (!is_string($text)) {
+            throw new InvalidArgumentException('Invalid argument');
+        }
+        $this->criteria['comment'] = $text;
         return $this;
     }
 

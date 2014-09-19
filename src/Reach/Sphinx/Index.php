@@ -2,6 +2,7 @@
 
 namespace Reach\Sphinx;
 
+use Reach\Service\Container as ServiceContainer;
 use XMLWriter;
 
 class Index {
@@ -21,8 +22,22 @@ class Index {
 
     }
 
+    public static function getConnection($connection_name = 'sphinx')
+    {
+        if (!ServiceContainer::has($connection_name)) {
+            throw new \InvalidArgumentException('Invalid argument');
+        }
+
+        return ServiceContainer::get($connection_name);
+    }
+
     public static function query($criteria = null)
     {
-        return new Query($criteria);
+        return new Query($criteria, get_called_class());
+    }
+
+    public function hydrate(array $data)
+    {
+
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-use Phactory\Mongo\Phactory;
 
 /**
  * Test Case Index Class for using Phactory *
@@ -8,9 +7,8 @@ use Phactory\Mongo\Phactory;
 abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
 {
 
+    /** @var  \Reach\Sphinx\Connection */
     protected static $connection;
-
-    protected static $phactory;
 
     /** @var  array */
     protected static $config;
@@ -19,8 +17,12 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         self::$config = [
+            'class' => '\Reach\Sphinx\Connection',
+            'host'  => 'localhost',
+            'port'  => 9312,
         ];
-
+        \Reach\Service\Container::register('sphinx', self::$config);
+        self::$connection = \Reach\Service\Container::get('sphinx');
     }
 
     public static function tearDownAfterClass()
@@ -33,5 +35,6 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        self::$connection->close();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Sphinx;
+namespace Model\Sphinx;
 
 use Reach\Sphinx\Index;
 
@@ -9,7 +9,7 @@ class TestIndex extends Index
 
     public static function getIndexName()
     {
-        return 'video';
+        return 'videos';
     }
 
     public function attributes()
