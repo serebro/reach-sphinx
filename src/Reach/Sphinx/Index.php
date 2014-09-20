@@ -7,12 +7,23 @@ use XMLWriter;
 
 class Index {
 
+    public static $default_connection_name = 'sphinx';
+
+
     public static function getIndexName()
     {
         return str_replace(['\\', '/', '-'], '_', strtolower(get_called_class()));
     }
 
-    public function attributes()
+    /**
+     * return [
+     *      'title' => ['type' => 'string', 'weight' => 100],
+     *      'description' => ['type' => 'string', 'weight' => 50],
+     *      'views' => ['type' => 'int', 'weight' => 70]
+     * ]
+     * @return array
+     */
+    public static function attributes()
     {
         return [];
     }
@@ -22,8 +33,15 @@ class Index {
 
     }
 
-    public static function getConnection($connection_name = 'sphinx')
+    /**
+     * @param string $connection_name
+     * @return mixed
+     */
+    public static function getConnection($connection_name = null)
     {
+        if (empty($connection_name)) {
+            $connection_name = self::$default_connection_name;
+        }
         if (!ServiceContainer::has($connection_name)) {
             throw new \InvalidArgumentException('Invalid argument');
         }

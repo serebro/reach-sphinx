@@ -118,11 +118,24 @@ class Criteria implements CriteriaInterface
     }
 
     /**
-     * @param array $sort
+     * @param array $sort ['count' => 1, 'updated_at' => -1]
      * @return $this
      */
     public function sort(array $sort)
     {
+        $order = [];
+        foreach($sort as $attribute => $dir) {
+            if ($dir === 1) {
+                $dir = 'asc';
+            } else if ($dir === -1) {
+                $dir = 'desc';
+            }
+            $order[] = "$attribute $dir";
+        }
+
+        if (count($order)) {
+            $this->criteria['setSortMode'] = [SPH_SORT_EXTENDED, join(',', $order)];
+        }
 
         return $this;
     }

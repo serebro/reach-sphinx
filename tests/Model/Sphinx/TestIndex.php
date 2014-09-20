@@ -12,7 +12,7 @@ class TestIndex extends Index
         return 'videos';
     }
 
-    public function attributes()
+    public static function attributes()
     {
         return [
             'title'      => 'string',

@@ -74,10 +74,11 @@ class Query extends Criteria
 
         /** @var SphinxClient $sphinx */
         $sphinx = $connection->getSphinxClient();
-        $sphinx = $this->build($sphinx);
+        $sphinx = $this->build($class, $sphinx);
         $text = $sphinx->escapeString($this->criteria['text']);
         $sphinx->addQuery($fields . $text, $class::getIndexName(), $this->criteria['comment']);
         $results = $sphinx->runQueries();
+        $sphinx->resetFilters();
 
         if (!is_array($results)) {
             $results[0]['error'] = $sphinx->getLastError();
@@ -87,7 +88,7 @@ class Query extends Criteria
         return new ResultSet($results[0]);
     }
 
-    protected function build(SphinxClient $sphinx)
+    protected function build($class, SphinxClient $sphinx)
     {
         if (!isset($this->criteria['setSelect'])) {
             $this->select('*');
@@ -98,7 +99,7 @@ class Query extends Criteria
                 $this->matchMode(SPH_MATCH_FULLSCAN);
                 //$this->matchMode(SPH_MATCH_ANY);
             } else {
-                $this->matchMode(SPH_MATCH_EXTENDED);
+                $this->matchMode(SPH_MATCH_EXTENDED2);
             }
         }
 
@@ -126,6 +127,7 @@ class Query extends Criteria
             $this->cutOff(0);
         }
 
+        // setLimits
         if (isset($this->criteria['limit'])) {
             $this->criteria['setLimits'] = [
                 $this->criteria['offset'],
@@ -135,18 +137,29 @@ class Query extends Criteria
             ];
         }
 
+        // setFieldWeights
+        $weights = [];
+        foreach ($class::attributes() as $attribute => $params) {
+            if (isset($params['weight'])) {
+                $weights[$attribute] = $params['weight'];
+            }
+        }
+        if (count($weights)) {
+            $sphinx->SetFieldWeights($weights);
+        }
+
         $fn = ['setSelect', 'setFilter', 'setFilterRange', 'setFilterFloatRange', 'setFilterString'];
         $methods = get_class_methods('\SphinxClient');
-        $exec = function($sphinx, $method, $params){
+        $exec = function ($sphinx, $method, $params) {
             if (!is_array($params)) {
                 $params = [$params];
             }
             call_user_func_array([$sphinx, $method], $params);
         };
 
-        foreach($this->criteria as $method => $params) {
+        foreach ($this->criteria as $method => $params) {
             if (in_array($method, $fn)) {
-                foreach($params as $_params) {
+                foreach ($params as $_params) {
                     $exec($sphinx, $method, $_params);
                 }
             } else if (in_array($method, $methods)) {
