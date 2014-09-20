@@ -2,7 +2,9 @@
 
 namespace Sphinx;
 
-class CriteriaTest extends \PHPUnit_Framework_TestCase
+use PhactoryTestCase;
+
+class CriteriaTest extends PhactoryTestCase
 {
 
     public function testCreate()

@@ -43,7 +43,7 @@ class Index {
             $connection_name = self::$default_connection_name;
         }
         if (!ServiceContainer::has($connection_name)) {
-            throw new \InvalidArgumentException('Invalid argument');
+            throw new \InvalidArgumentException("Reach service \"$connection_name\" is not defined.");
         }
 
         return ServiceContainer::get($connection_name);
