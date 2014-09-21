@@ -80,10 +80,12 @@ class XmlPipe
             $this->xml->startElement('sphinx:schema');
             {
                 foreach ($this->attributes as $attribute => $params) {
-                    if (empty($params['type'])) {
+                    if (empty($params['type']) && empty($params['field'])) {
                         continue;
                     }
-                    $element_type = $params['type'] === 'field' ? 'field' : 'attr';
+
+                    $element_type = $params['field'] ? 'field' : 'attr';
+
                     $this->xml->startElement("sphinx:$element_type");
                     $this->xml->writeAttribute('name', $attribute);
                     $this->xml->writeAttribute('type', $params['type']);

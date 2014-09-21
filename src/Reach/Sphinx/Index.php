@@ -21,8 +21,9 @@ class Index {
 
     /**
      * return [
-     *      'title'         => ['type' => 'string', 'weight' => 100],
-     *      'description'   => ['type' => 'string', 'weight' => 50],
+     *      'title'         => ['field' => true, 'weight' => 100],
+     *      'description'   => ['field' => true, 'weight' => 50],
+     *      'code'          => ['type' => 'string', 'weight' => 20]
      *      'views'         => ['type' => 'int', 'bits' => 32, 'default' => 0, 'weight' => 70]
      * ]
      * @return array
