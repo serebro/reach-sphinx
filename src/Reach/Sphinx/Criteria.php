@@ -8,6 +8,17 @@ use InvalidArgumentException;
 class Criteria implements CriteriaInterface
 {
 
+    private static $_reserved_attrs = [
+        'id',           // @id (match ID)
+        'weight',       // @weight (match weight)
+        'rank',         // @rank (match weight)
+        'relevance',    // @relevance (match weight)
+        'random',       // @random (return results in random order)
+
+        'group',        // @group (groupby function value)
+        'count',        // @count (amount of matches in group)
+    ];
+
     private static $_match_modes = [
         SPH_MATCH_ALL,
         SPH_MATCH_ANY,
