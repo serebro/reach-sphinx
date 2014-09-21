@@ -38,7 +38,7 @@ class Index {
      * @param array $attribute_params
      * @return mixed
      */
-    public static function xmlPipePrepareAttribute($attribute, $item, $attribute_params)
+    public static function xmlPipePrepareAttribute($attribute, $item, array $attribute_params = [])
     {
         return null;
     }
@@ -94,10 +94,9 @@ class Index {
             foreach ($items as $item) {
                 $xml->startElement('sphinx:document');
                 {
+                    $id = static::xmlPipePrepareAttribute('id', $item, []);
+                    $xml->writeAttribute('id', $id);
                     foreach($attributes as $attribute => $params) {
-                        $id = static::xmlPipePrepareAttribute('id', $item, []);
-                        $xml->writeAttribute('id', $id);
-
                         if ($attribute == 'id') {
                             continue;
                         }
