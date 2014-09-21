@@ -53,11 +53,11 @@ class Index {
             throw new InvalidArgumentException('Invalid argument "output_method"');
         }
 
-        if (!is_array($items) || !($items instanceof \Traversable)) {
+        if (!is_array($items) && !($items instanceof \Traversable)) {
             throw new InvalidArgumentException('Invalid argument "items"');
         }
 
-        $attributes = self::attributes();
+        $attributes = static::attributes();
         $xml = new XMLWriter();
 
         if ($output_method === self::XML_OUTPUT_MEMORY) {
@@ -95,14 +95,14 @@ class Index {
                 $xml->startElement('sphinx:document');
                 {
                     foreach($attributes as $attribute => $params) {
-                        $id = self::xmlPipePrepareAttribute('id', $item, []);
+                        $id = static::xmlPipePrepareAttribute('id', $item, []);
                         $xml->writeAttribute('id', $id);
 
                         if ($attribute == 'id') {
                             continue;
                         }
 
-                        $value = self::xmlPipePrepareAttribute($attribute, $item, $params);
+                        $value = static::xmlPipePrepareAttribute($attribute, $item, $params);
                         if (is_null($value)) {
                             continue;
                         }
@@ -114,24 +114,6 @@ class Index {
                             $xml->writeElement($attribute, $value);
                         }
                     }
-
-                    //$id = Crc64::format((string)$item['_id'], '%u');
-                    //$xml->writeAttribute('id', $id);
-                    ////$xml->writeAttribute('id', $fake_id++);
-                    ////$xml->writeElement('title', $video['snippet']['title']);
-                    //
-                    //$xml->startElement('title');
-                    //$xml->writeCData($item['snippet']['title']);
-                    //$xml->endElement(); // title
-                    //
-                    //$xml->startElement('descr');
-                    //$xml->writeCData(str_replace(["\n", "\r", "\t"], ' ', $item['snippet']['description']));
-                    //$xml->endElement(); // descr
-                    //
-                    //$xml->writeElement('storage_id', $item['_id']);
-                    //
-                    //$xml->writeElement('viewCount', $item['stats']['viewCount']);
-                    ////$xml->writeElement('published', $video['snippet']['publishedAt']->sec);
                 }
                 $xml->endElement(); // sphinx:document
             }
