@@ -48,7 +48,7 @@ class Index {
      * @param $output_method
      * @return string
      */
-    protected function getXmlPipe($items, $output_method, $build_schema = true) {
+    public static function getXmlPipe($items, $output_method, $build_schema = true) {
         if ($output_method !== self::XML_OUTPUT_MEMORY && $output_method !== self::XML_OUTPUT_STDOUT) {
             throw new InvalidArgumentException('Invalid argument "output_method"');
         }
