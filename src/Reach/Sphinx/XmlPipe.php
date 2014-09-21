@@ -40,7 +40,7 @@ class XmlPipe
         if ($this->_output_method === self::OUTPUT_MEMORY) {
             $this->xml->openMemory();
         } else if ($this->_output_method === self::OUTPUT_STDOUT) {
-            $this->xml->openURI(STDOUT);
+            $this->xml->openURI('php://output');
         }
     }
 
@@ -84,7 +84,7 @@ class XmlPipe
                         continue;
                     }
 
-                    $element_type = $params['field'] ? 'field' : 'attr';
+                    $element_type = empty($params['field']) ? 'attr' : 'field';
 
                     $this->xml->startElement("sphinx:$element_type");
                     $this->xml->writeAttribute('name', $attribute);
