@@ -88,7 +88,9 @@ class XmlPipe
 
                     $this->xml->startElement("sphinx:$element_type");
                     $this->xml->writeAttribute('name', $attribute);
-                    $this->xml->writeAttribute('type', $params['type']);
+                    if (!empty($params['type'])) {
+                        $this->xml->writeAttribute('type', $params['type']);
+                    }
                     if (!empty($params['bits'])) {
                         $this->xml->writeAttribute('bits', $params['bits']);
                     }
